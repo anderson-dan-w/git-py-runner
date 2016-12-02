@@ -3,9 +3,15 @@ import sys
 import argparse
 import shutil
 import stat
+
+## need to tell Windows where git is *BEFORE IMPORTING*
+if sys.platform == "win32":
+    git_path = r"C:\Program Files (x86)\Git\bin\git.exe"
+    os.environ["GIT_PYTHON_GIT_EXECUTABLE"] = git_path
 from git import Repo as gitrepo
 
-SCRATCH_DIR = os.path.join(os.getenv("HOME"), "scratch")
+HOME = os.getenv("HOME") or os.getenv("HOMEPATH")
+SCRATCH_DIR = os.path.join(HOME, "scratch")
 
 
 def get_repo_dir(repo_name):
@@ -23,6 +29,8 @@ def pull_gitrepo(repo_name):
     repo_dir = get_repo_dir(repo_name)
     if os.path.exists(repo_dir):
         shutil.rmtree(repo_dir, onerror=del_rw)
+    if not os.path.exists(repo_dir):
+        os.makedirs(repo_dir)
     gitrepo.clone_from(repo_url, repo_dir)
 
 
@@ -35,7 +43,6 @@ def run_repo(repo_name):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("repo-name", help="git repo name")
+    parser.add_argument("repo_name", help="git repo name")
     args = parser.parse_args()
-
     run_repo(args.repo_name)
