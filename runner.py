@@ -26,16 +26,22 @@ def pull_gitrepo(repo_name):
     gitrepo.clone_from(repo_url, repo_dir)
 
 
-def run_repo(repo_name):
+def run_repo(repo_name, repo_args):
     pull_gitrepo(repo_name)
     sys.path.insert(0, get_repo_dir(repo_name))
     import src.main as repo_main
-    repo_main.main()
+    repo_main.main(*repo_args)
 
+
+def main(*args):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("repo_name", metavar="repo-name",
+        help="git repo name")
+    ## allow users to pass args for repo.main(), even though we can't
+    ## know what those args are yet - just bundle them up and pass along
+    args, repo_args = parser.parse_known_args(*args)
+
+    run_repo(args.repo_name, repo_args)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("repo-name", help="git repo name")
-    args = parser.parse_args()
-
-    run_repo(args.repo_name)
+    main(sys.argv[1:])
