@@ -6,7 +6,7 @@ import stat
 
 ## need to tell Windows where git is *BEFORE IMPORTING*
 if sys.platform == "win32":
-    git_path = r"C:\Program Files (x86)\Git\bin\git.exe"
+    git_path = r"C:\Program Files\Git\bin\git.exe"
     os.environ["GIT_PYTHON_GIT_EXECUTABLE"] = git_path
 from git import Repo as gitrepo
 
