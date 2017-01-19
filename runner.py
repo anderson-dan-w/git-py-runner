@@ -6,9 +6,18 @@ import stat
 
 ## need to tell Windows where git is *BEFORE IMPORTING*
 if sys.platform == "win32":
-    git_path = r"C:\Program Files\Git\bin\git.exe"
-    os.environ["GIT_PYTHON_GIT_EXECUTABLE"] = git_path
-from git import Repo as gitrepo
+    git_base = r"C:\{}\Git\bin\git.exe"
+    program_files = ["Program Files", "Program Files (x86)"]
+    for location in program_files:
+        git_path = git_base.format(location)
+        if os.path.exists(git_path):
+            os.environ["GIT_PYTHON_GIT_EXECUTABLE"] = git_path
+            break
+    ## yes, this is for-else, not an incorrect if-else
+    else:
+        raise FileNotFoundError("can't find git.exe")
+## ignore flake8 complaint of 'import not at top of file'
+from git import Repo as gitrepo  # noqa: E402
 
 ## *nix/Mac have $HOME, Windows has $HOMEPATH
 HOME = os.getenv("HOME") or os.getenv("HOMEPATH")
